@@ -1,10 +1,6 @@
 # Maia ESP32-S2 Device Firmware Update
 
-The Maia board can be updated 
-
-
-
-
+The Maia board can be updated using DFU (Device Firmware Update) on the native USB port (micro-USB) by placing the chip into rom bootloader mode.
 
 ---
 
@@ -12,7 +8,7 @@ The Maia board can be updated
 
 We investigated a bit the new ESP32-S2 deeper features while developing the Maia board Most of the findings are now public, documented and offially usable. You can a video we did in that phase.
 
-[ESP32-S2 USB Video on Youtube](https://www.example.com)
+[ESP32-S2 USB Video on Youtube](https://www.youtube.com/watch?v=s9r2c-85UJM&)
 
 
 ## Using our DFU Web flasher for ESP32-S2
@@ -49,5 +45,5 @@ then run (as a superuser)  `udevadm control --reload-rules`
 #### Windows 10
 
 WHen you plug a USB device in windows it attempts to find a suitable driver otherwise the device isn't available. To make it available you have to run a .INF file that tells the system to use the WinUSB driver for our board so that Chrome can actually us it.
-We have prepare the required file which is available [ESP32-S2BootUSB.inf](here).
+We have prepare the required file which is available [here](ESP32-S2BootUSB.inf).
 
