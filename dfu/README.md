@@ -44,6 +44,6 @@ then run (as a superuser)  `udevadm control --reload-rules`
 
 #### Windows 10
 
-WHen you plug a USB device in windows it attempts to find a suitable driver otherwise the device isn't available. To make it available you have to run a .INF file that tells the system to use the WinUSB driver for our board so that Chrome can actually us it.
-We have prepare the required file which is available [here](ESP32-S2BootUSB.inf).
-
+WHen you plug a USB device in windows it attempts to find a suitable driver otherwise the device isn't available. To make it available you have to install a .INF file that tells the system to use the WinUSB driver for our board so that Chrome can actually us it.
+We have prepared the required .INF file installer which is available [here (Installer)](https://dfu.stetelthings.com/ESP32-S2-DFU-WinUSB.zip).
+For the Espressif guys: maybe you could add a WCID descriptor to the ROM code. This would simplify the driver setup in Windows: [WCID](https://github.com/pbatard/libwdi/wiki/WCID-Devices)
