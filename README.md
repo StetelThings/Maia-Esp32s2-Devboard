@@ -42,7 +42,7 @@ You get the GPIO0, EN, 3.3V, RX, TX and GND signals for programming on a breadbo
 Solder header pins with the long side on the backside and you're done.
 
 
-### Attaching sensor or pheriphals
+### Attaching sensor or peripherals
 You can solder header pins withe the long side on the front to attach external sensors with simple jump-wires.
 
 ### Self powered with a battery
