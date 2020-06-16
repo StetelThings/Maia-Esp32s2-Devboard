@@ -9,6 +9,7 @@
 
 #include "app_driver.h"
 #include <app_wifi.h>
+#include <esp_rmaker_ota.h>
 
 
 static const char *TAG = "app_main";
@@ -77,7 +78,12 @@ void app_main()
     esp_rmaker_device_add_param("RGB_LED", "Blue", esp_rmaker_bool(false), PROP_FLAG_READ | PROP_FLAG_WRITE);
     esp_rmaker_param_add_ui_type("RGB_LED", "Blue", ESP_RMAKER_UI_TOGGLE);
 
-    
+
+    /* Enable OTA */
+    esp_rmaker_ota_config_t ota_config = {
+        .server_cert = ESP_RMAKER_OTA_DEFAULT_SERVER_CERT,
+    };
+    esp_rmaker_ota_enable(&ota_config, OTA_USING_PARAMS);    
 
     
     /* Start the ESP RainMaker Agent */

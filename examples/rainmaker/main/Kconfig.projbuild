@@ -1,4 +1,4 @@
-menu "Example Configuration"
+menu "Maia Config"
 
     config APP_PROV_SHOW_QR
         bool "Show provisioning QR code"
@@ -6,10 +6,40 @@ menu "Example Configuration"
         help
             Show the QR code for provisioning.
 
-    config APP_LED_GPIO
-        int "RGB LED GPIO"
-        default 18
+    config APP_REDLED_GPIO
+        int "RED LED GPIO"
+        default 8
         help
-            Set the WS2812 RGB LED GPIO.
+            Set the RED LED GPIO.
+        
+    config APP_GREENLED_GPIO
+        int "GREEN LED GPIO"
+        default 9
+        help
+            Set the GREEN LED GPIO.
+    
+    config APP_BLUELED_GPIO
+        int "BLUE LED GPIO"
+        default 10
+        help
+            Set the BLUE LED GPIO.
+
+    config APP_BUTTON_GPIO
+        int "BUTTON GPIO"
+        default 11
+        help
+            Set the BUTTON GPIO.
+
+    config APP_BUTTON_ACTIVE_LEVEL
+        int "BUTTON ACTIVE LEVEL"
+        default 0
+        help
+            Set the BUTTON ACTIVE LEVEL.
+
+    config APP_REPORTING_PERIOD
+        int "REPORTING PERIOD (seconds)"
+        default 60
+        help
+            Set the REPORTING PERIOD (seconds).
 
 endmenu

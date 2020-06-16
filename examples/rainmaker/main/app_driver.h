@@ -27,19 +27,7 @@
 #include <iot_button.h>
 
 
-#define REPORTING_PERIOD    60 /* Seconds */
 
-
-#define BUTTON_GPIO          11
-#define BUTTON_ACTIVE_LEVEL  0
-
-#define OUTPUT_GPIO_RED   8
-#define OUTPUT_GPIO_GREEN 9
-#define OUTPUT_GPIO_BLUE  10
-
-
-
-esp_err_t app_sensor_init(void);
 float getTemperture();
 void app_driver_init();
 esp_err_t app_driver_set_gpio(const char *name, bool state);

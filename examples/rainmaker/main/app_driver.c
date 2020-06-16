@@ -68,7 +68,7 @@ esp_err_t app_sensor_init(void)
         .name = "app_sensor_update_tm"
     };
     if (esp_timer_create(&sensor_timer_conf, &sensor_timer) == ESP_OK) {
-        esp_timer_start_periodic(sensor_timer, REPORTING_PERIOD * 1000000U);
+        esp_timer_start_periodic(sensor_timer, CONFIG_APP_REPORTING_PERIOD * 1000000U);
         return ESP_OK;
     }
     return ESP_FAIL;
@@ -85,11 +85,11 @@ static void button_press_3sec_cb(void *arg)
 esp_err_t app_driver_set_gpio(const char *name, bool state)
 {
     if (strcmp(name, "Red") == 0) {
-        gpio_set_level(OUTPUT_GPIO_RED, state);
+        gpio_set_level(CONFIG_APP_REDLED_GPIO, state);
     } else if (strcmp(name, "Green") == 0) {
-        gpio_set_level(OUTPUT_GPIO_GREEN, state);
+        gpio_set_level(CONFIG_APP_GREENLED_GPIO, state);
     } else if (strcmp(name, "Blue") == 0) {
-        gpio_set_level(OUTPUT_GPIO_BLUE, state);
+        gpio_set_level(CONFIG_APP_BLUELED_GPIO, state);
     } else {
         return ESP_FAIL;
     }
@@ -99,7 +99,7 @@ esp_err_t app_driver_set_gpio(const char *name, bool state)
 void app_driver_init()
 {
 
-    button_handle_t btn_handle = iot_button_create(BUTTON_GPIO, BUTTON_ACTIVE_LEVEL);
+    button_handle_t btn_handle = iot_button_create(CONFIG_APP_BUTTON_GPIO, CONFIG_APP_BUTTON_ACTIVE_LEVEL);
     if (btn_handle) {
         iot_button_add_on_press_cb(btn_handle, 3, button_press_3sec_cb, NULL);
     }
@@ -109,13 +109,13 @@ void app_driver_init()
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = 1,
     };
-    uint64_t pin_mask = (((uint64_t)1 << OUTPUT_GPIO_RED ) | ((uint64_t)1 << OUTPUT_GPIO_GREEN ) | ((uint64_t)1 << OUTPUT_GPIO_BLUE ));
+    uint64_t pin_mask = (((uint64_t)1 << CONFIG_APP_REDLED_GPIO ) | ((uint64_t)1 << CONFIG_APP_GREENLED_GPIO ) | ((uint64_t)1 << CONFIG_APP_BLUELED_GPIO ));
     io_conf.pin_bit_mask = pin_mask;
    
     gpio_config(&io_conf);
-    gpio_set_level(OUTPUT_GPIO_RED, false);
-    gpio_set_level(OUTPUT_GPIO_GREEN, false);
-    gpio_set_level(OUTPUT_GPIO_BLUE, false);
+    gpio_set_level(CONFIG_APP_REDLED_GPIO, false);
+    gpio_set_level(CONFIG_APP_GREENLED_GPIO, false);
+    gpio_set_level(CONFIG_APP_BLUELED_GPIO, false);
 
 
     app_sensor_init();
