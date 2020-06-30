@@ -64,3 +64,8 @@ We have a plastic enclosure kit available that can be used to build a complete a
 - Update is possible either via OTA or using DFU at the micro-USB port.
 - RGB and charging leds are visible through specific light-guide in the enclosure.
 
+### Where to buy one
+
+You can buy a Maia board from:
+- [Amazon.it](https://amzn.to/2Nnwgw7)
+- [Tindie](https://bit.ly/MaiaTindie)    
