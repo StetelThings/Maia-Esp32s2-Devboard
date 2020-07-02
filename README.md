@@ -69,4 +69,4 @@ We have a plastic enclosure kit available that can be used to build a complete a
 You can buy a Maia board from:
 - [Amazon.de](https://bit.ly/MaiaDe)
 - [Amazon.it](https://amzn.to/2Nnwgw7)
-- [Tindie](https://bit.ly/MaiaTindie)    
+- [Tindie](https://bit.ly/MaiaTindie)
