@@ -27,7 +27,8 @@
 #include <iot_button.h>
 
 
+extern esp_rmaker_device_t *temp_sensor_device;
 
-float getTemperture();
+float getTemperature();
 void app_driver_init();
 esp_err_t app_driver_set_gpio(const char *name, bool state);
