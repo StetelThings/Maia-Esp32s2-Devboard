@@ -39,7 +39,7 @@ void initSensTemp(){
     ESP_LOGI(TAG, "Temperature sensor started");
 }
 
-float getTemperture()
+float getTemperature()
 {
     if(!_initialized) {
         initSensTemp();
@@ -54,14 +54,18 @@ float getTemperture()
 
 static void app_sensor_update(void *priv)
 {
-    tsens_out = getTemperture();
-    esp_rmaker_update_param("Temperature Sensor", ESP_RMAKER_DEF_TEMPERATURE_NAME, esp_rmaker_float(tsens_out)); 
+    tsens_out = getTemperature();
+    //esp_rmaker_update_param("Temperature Sensor", ESP_RMAKER_DEF_TEMPERATURE_NAME, esp_rmaker_float(tsens_out)); 
+    esp_rmaker_param_update_and_report(
+            esp_rmaker_device_get_param_by_type(temp_sensor_device, ESP_RMAKER_PARAM_TEMPERATURE),
+            esp_rmaker_float(tsens_out));
 }
+
 
 esp_err_t app_sensor_init(void)
 {
     
-    tsens_out = getTemperture();
+    tsens_out = getTemperature();
     esp_timer_create_args_t sensor_timer_conf = {
         .callback = app_sensor_update,
         .dispatch_method = ESP_TIMER_TASK,
