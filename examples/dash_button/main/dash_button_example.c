@@ -16,6 +16,7 @@
 #include "protocol_examples_common.h"
 #include "esp_tls.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 
 #include "esp_http_client.h"
 
@@ -26,8 +27,16 @@
 #define PWR_OFF_PIN  	               12
 #define PWR_OFF_LVL     	            1
 
+#define CHG_LED_DISABLE_PIN	           13
 #define RGB_LED_R_PIN                   8
 #define RGB_LED_G_PIN                   9
+#define RGB_LED_B_PIN                  10
+#define LEDC_LS_TIMER          LEDC_TIMER_1
+#define LEDC_LS_MODE           LEDC_LOW_SPEED_MODE
+#define LEDC_TEST_CH_NUM       (3)
+#define LEDC_TEST_DUTY         (4000)
+#define LEDC_TEST_FADE_TIME    (3000)
+
 
 #define MAX_HTTP_RECV_BUFFER          512
 #define MAX_HTTP_OUTPUT_BUFFER       2048
@@ -40,6 +49,39 @@
 
 
 static const char *TAG = "HTTP_CLIENT";
+
+
+
+ledc_channel_config_t ledc_channel[LEDC_TEST_CH_NUM] = {
+
+    {
+        .channel    =  LEDC_CHANNEL_0,
+        .duty       = 0,
+        .gpio_num   = RGB_LED_R_PIN,
+        .speed_mode = LEDC_LS_MODE,
+        .hpoint     = 0,
+        .timer_sel  = LEDC_LS_TIMER
+    },
+    {
+        .channel    =  LEDC_CHANNEL_1,
+        .duty       = 0,
+        .gpio_num   = RGB_LED_G_PIN,
+        .speed_mode = LEDC_LS_MODE,
+        .hpoint     = 0,
+        .timer_sel  = LEDC_LS_TIMER
+    },
+    {
+        .channel    =  LEDC_CHANNEL_2,
+        .duty       = 0,
+        .gpio_num   = RGB_LED_B_PIN,
+        .speed_mode = LEDC_LS_MODE,
+        .hpoint     = 0,
+        .timer_sel  = LEDC_LS_TIMER
+    }
+};
+
+
+
 
 
 static void power_off() {
@@ -134,6 +176,28 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
+static void yellow_led() {
+    ledc_set_duty_and_update(ledc_channel[0].speed_mode, ledc_channel[0].channel, 700, 0);
+    ledc_set_duty_and_update(ledc_channel[1].speed_mode, ledc_channel[1].channel, 200, 0);
+    ledc_set_duty_and_update(ledc_channel[2].speed_mode, ledc_channel[2].channel, 20, 0);
+}
+static void red_led() {
+    ledc_set_duty_and_update(ledc_channel[0].speed_mode, ledc_channel[0].channel, 700, 0);
+    ledc_set_duty_and_update(ledc_channel[1].speed_mode, ledc_channel[1].channel, 0, 0);
+    ledc_set_duty_and_update(ledc_channel[2].speed_mode, ledc_channel[2].channel, 0, 0);
+
+}
+static void green_led() {
+    ledc_set_duty_and_update(ledc_channel[0].speed_mode, ledc_channel[0].channel, 0, 0);
+    ledc_set_duty_and_update(ledc_channel[1].speed_mode, ledc_channel[1].channel, 700, 0);
+    ledc_set_duty_and_update(ledc_channel[2].speed_mode, ledc_channel[2].channel, 0, 0);
+}
+static void led_off() {
+    ledc_set_duty_and_update(ledc_channel[0].speed_mode, ledc_channel[0].channel, 0, 0);
+    ledc_set_duty_and_update(ledc_channel[1].speed_mode, ledc_channel[1].channel, 0, 0);
+    ledc_set_duty_and_update(ledc_channel[2].speed_mode, ledc_channel[2].channel, 0, 0);
+}
+
 static void http_rest_with_url(void)
 {
     char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
@@ -154,7 +218,9 @@ static void http_rest_with_url(void)
     esp_http_client_handle_t client = esp_http_client_init(&config);
 
 
+
     esp_err_t err = esp_http_client_perform(client);
+    led_off();
     if (err == ESP_OK) {
         ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
                 esp_http_client_get_status_code(client),
@@ -162,20 +228,17 @@ static void http_rest_with_url(void)
 
         if (esp_http_client_get_status_code(client) == 200) {
             ESP_LOGI("Maia Board", "Green LED ON!");
-            vTaskDelay(1000/portTICK_PERIOD_MS);
-            gpio_set_level(RGB_LED_G_PIN, 1);
+            green_led();
         }
         else {
             ESP_LOGI("Maia Board", "Red LED ON...");
-            vTaskDelay(1000/portTICK_PERIOD_MS);
-            gpio_set_level(RGB_LED_R_PIN, 1);
+            red_led();
         }
 
     } else {
         ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(err));
         ESP_LOGE("Maia Board", "Red LED ON...");
-        vTaskDelay(1000/portTICK_PERIOD_MS);
-        gpio_set_level(RGB_LED_R_PIN, 1);
+        red_led();
     }
     
 
@@ -197,6 +260,12 @@ static void http_test_task(void *pvParameters)
 void app_main(void)
 {
 
+    int ch;
+
+    //gpio_reset_pin(PWR_OFF_PIN);
+    gpio_set_direction(PWR_OFF_PIN, GPIO_MODE_OUTPUT);
+
+
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());
@@ -206,20 +275,34 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    //GPIOs reset needed in ESP32-S2 BETA
-    gpio_reset_pin(RGB_LED_R_PIN);
-    gpio_reset_pin(RGB_LED_G_PIN);
-    gpio_reset_pin(PWR_OFF_PIN);
-    
-    gpio_set_direction(RGB_LED_R_PIN, GPIO_MODE_OUTPUT);
-    gpio_set_direction(RGB_LED_G_PIN, GPIO_MODE_OUTPUT);
-    gpio_set_direction(PWR_OFF_PIN, GPIO_MODE_OUTPUT);
-	
-    gpio_set_level(RGB_LED_G_PIN, 0);
-    gpio_set_level(RGB_LED_R_PIN, 0);
 
+
+    /*
+     * Prepare and set configuration of timers
+     * that will be used by LED Controller
+     */
+    ledc_timer_config_t ledc_timer = {
+        .duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
+        .freq_hz = 5000,                      // frequency of PWM signal
+        .speed_mode = LEDC_LS_MODE,           // timer mode
+        .timer_num = LEDC_LS_TIMER,            // timer index
+        .clk_cfg = LEDC_AUTO_CLK,              // Auto select the source clock
+    };
+    // Set configuration of timer0 for high speed channels
+    ledc_timer_config(&ledc_timer);
+
+    
+    // Set LED Controller with previously prepared configuration
+    for (ch = 0; ch < LEDC_TEST_CH_NUM; ch++) {
+        ledc_channel_config(&ledc_channel[ch]);
+    }
+
+    // Initialize fade service.
+    ledc_fade_func_install(0);
 
     ESP_LOGI("DASH_BUTTON_EXAMPLE", "START!");
+    vTaskDelay(500/portTICK_PERIOD_MS);
+    yellow_led();
 
 
     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
@@ -228,6 +311,7 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
     ESP_LOGI(TAG, "Connected to AP");
+
 
     xTaskCreate(&http_test_task, "http_test_task", 8192, NULL, 5, NULL);
 
