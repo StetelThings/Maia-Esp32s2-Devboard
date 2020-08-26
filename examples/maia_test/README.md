@@ -3,4 +3,4 @@
 
 This is a testing app for Maia DevBoard.
 
-Build, flash and follow console messages.
+Please build, flash and follow console messages.
